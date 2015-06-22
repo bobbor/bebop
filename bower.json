@@ -1,0 +1,35 @@
+{
+  "name": "bebop.js",
+  "main": "dist/bebop.min.js",
+  "version": "1.0.0",
+  "homepage": "https://bobbor.github.io/bebop/",
+  "authors": [
+    "Philipp Paul [ me@philipp-paul.com ]"
+  ],
+  "description": "bebop.js is is a small handy library do manipulate dom in modern browsers",
+  "moduleType": [
+    "amd",
+    "globals",
+    "node"
+  ],
+  "keywords": [
+    "bebop",
+    "dom",
+    "node",
+    "bebop",
+    "manipulation",
+    "selector",
+    "ajax",
+    "io"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test"
+  ],
+  "dependencies": {
+    "underscore": "~1.8.2"
+  }
+}

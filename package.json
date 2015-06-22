@@ -1,0 +1,51 @@
+{
+  "name": "bebop.js",
+  "version": "1.0.4",
+  "description": "bebop.js is is a small handy library do manipulate dom in modern browsers",
+  "keywords": [
+    "bebop",
+    "dom",
+    "node",
+    "bebop",
+    "manipulation",
+    "selector",
+    "ajax",
+    "io"
+  ],
+  "homepage": "https://bobbor.github.io/bebop/",
+  "author": "Philipp Paul [ me@philipp-paul.com ]",
+  "devDependencies": {
+    "chai": "2.1.0",
+    "coveralls": "2.11.2",
+    "grunt": "0.4.5",
+    "grunt-contrib-clean": "0.6.0",
+    "grunt-contrib-coffee": "^0.13.0",
+    "grunt-contrib-uglify": "0.8.0",
+    "karma": "0.12.31",
+    "karma-chai": "0.1.0",
+    "karma-coverage": "0.2.7",
+    "karma-fixture": "0.2.2",
+    "karma-html2js-preprocessor": "0.1.0",
+    "karma-mocha": "0.1.10",
+    "karma-phantomjs-launcher": "0.1.4",
+    "karma-requirejs": "0.2.2",
+    "karma-sinon": "1.0.4",
+    "karma-slimerjs-launcher": "0.1.2",
+    "karma-teamcity-reporter": "0.1.2",
+    "mocha": "2.1.0",
+    "requirejs": "2.1.16",
+    "sinon": "1.12.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/bobbor/bebop.git"
+  },
+  "engines": {
+    "node": ">=0.12.0"
+  },
+  "license": "MIT",
+  "main": "./dist/bebop.min.js",
+  "scripts": {
+    "test": "./node_modules/karma/bin/karma start karma.ci.js"
+  }
+}
