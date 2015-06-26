@@ -2,7 +2,7 @@
 /*globals define,before,after,it,expect,describe,Fixture,sinon */
 (function() {
     'use strict';
-    var $ = window.DOM, fix, fixtures;
+    var $ = window.bebop, fix, fixtures;
     describe('EventInstance', function() {
 
         before(function() {

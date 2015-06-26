@@ -2,7 +2,7 @@
 /*globals define, describe, before, after, it, expect, Fixture, sinon */
 (function() {
     'use strict';
-    var $ = window.DOM, fix, fixtures, json;
+    var $ = window.bebop, fix, fixtures, json;
     describe('::Selector::', function() {
         before(function() {
             fix = new Fixture('test/fixtures');

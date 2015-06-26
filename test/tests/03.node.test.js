@@ -2,7 +2,7 @@
 /*globals define,before,after,it,expect,describe,Fixture */
 (function() {
     'use strict';
-    var $  = window.DOM, fix, fixtures, html;
+    var $  = window.bebop, fix, fixtures, html;
     describe('::Element::', function() {
 
         before(function() {

@@ -1,6 +1,6 @@
 (function () {
     'use strict';
-    var $ = window.DOM;
+    var $ = window.bebop;
     describe('IO', function () {
         describe('types', function () {
             it('should do a get request', function (done) {

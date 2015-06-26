@@ -1,5 +1,5 @@
 (function() {
-  var $ = window.DOM;
+  var $ = window.bebop;
   var fix,fixtures,html;
   describe('::Utils::', function() {
     before(function() {

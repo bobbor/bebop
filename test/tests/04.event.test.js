@@ -2,9 +2,9 @@
 /*globals define,before,after,it,expect,describe,Fixture,sinon */
 (function() {
     'use strict';
-    var $ = window.DOM, fix, fixtures, html;
+    var fix, fixtures, html;
     var oldready = document.readyState, newReady;
-    $.ready(function(ev) {
+    window.$.ready(function(ev) {
         newReady = ev;
     });
     describe('::Event::', function() {
@@ -71,7 +71,7 @@
 
             it('should not trigger, if selector is not in wrapper', function() {
                 var handler1 = sinon.spy();
-                
+
                 var elm = $.one('#event');
                 elm.on('click', handler1, 'pre');
                 elm.one('a').click();
@@ -80,7 +80,7 @@
 
             it('should not trigger, if selector is in wrapper but not target', function() {
                 var handler1 = sinon.spy();
-                
+
                 var elm = $.one('#event');
                 elm.on('click', handler1, 'span');
                 elm.one('a').click();

@@ -3,14 +3,13 @@ module.exports = function (config) {
     basePath: '',
     frameworks: ['mocha', 'fixture', 'chai', 'sinon'],
     files: [
-      {pattern: 'src/*.coffee'},
+      {pattern: 'src/*.js'},
       {pattern: 'test/fixtures/**/*'},
       {pattern: 'test/tests/*.test.js'},
       {pattern: 'test/io/*', watched: false, included: false, served: true}
     ],
     exclude: [],
     preprocessors: {
-      '**/*.coffee': ['coffee'],
       'test/fixtures/**/*.html': ['html2js'],
       'test/fixtures/**/*.json': ['html2js'],
       'src/*.js': ['coverage']
