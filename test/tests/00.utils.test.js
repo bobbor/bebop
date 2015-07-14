@@ -26,7 +26,7 @@
         expect(id1).to.not.equal(id2).and.to.not.equal(id3);
       });
 
-      it('should creae uuids on node', function() {
+      it('should create uuids on node', function() {
         var el = $.one('#id2 button');
         expect(el.prop('id')).to.equal('');
         //noinspection BadExpressionStatementJS
@@ -36,6 +36,34 @@
         //noinspection BadExpressionStatementJS
         expect(el.hasAttr('id')).to.be.true;
       });
-    })
+
+      it('should return the existing uuid', function() {
+        var el = $.one('#id2');
+        expect(el.uuid()).to.equal('id2');
+      })
+    });
+
+    describe('noConflict', function() {
+      var bebopStore;
+      before(function() {
+        bebopStore = window.bebop;
+      });
+      after(function() {
+        window.$ = window.bebop = bebopStore;
+      });
+
+      it('should noConflict', function() {
+        var own = $.noConflict();
+        expect(own.VERSION).to.equal('1.0.5');
+        expect(bebop.VERSION).to.equal('1.0.5');
+        expect(window.$).to.be.undefined;
+      });
+      it('should deep noConflict', function() {
+        var own = $.noConflict(true);
+        expect(own.VERSION).to.equal('1.0.5');
+        expect(window.bebop).to.be.undefined;
+        expect(window.$).to.be.undefined;
+      });
+    });
   });
 }());

@@ -28,6 +28,8 @@ module.exports = function (config) {
       dir: 'coverage',
       reporters: [{
         type: 'lcovonly', subdir: '.', file: 'lcov.info'
+      }, {
+        type: 'html', subdir: 'html'
       }]
     }
   });

@@ -1,7 +1,7 @@
 /*globals define */
 (function (root, factory) {
   // backbone like definition for different environments
-  /* istanbul ignore else */
+  /* istanbul ignore next: this is umd */
   if (typeof define === 'function' && define.amd) {
     define(['exports'], function (exports) {
       root.bebop = factory(root, exports);
@@ -30,7 +30,7 @@
       }
       return matches[i] ? true : false;
     };
-  var func = 'f', obj = 'o', str = 's', num = 'n', undef = 'u';
+  var func = 'f', obj = 'o', str = 's', undef = 'u';
 
   function is(type, item) {
     return (typeof item)[0] === type;
@@ -50,16 +50,9 @@
     };
   }());
 
-  var extend = function () {
-    var hasOwn = {}.hasOwnProperty;
-    var args = Array.prototype.slice.call(arguments);
-    var target = args.shift(), src;
-    if (args.length > 1) {
-      src = extend.apply(this, args);
-    } else {
-      src = args[0];
-    }
+  var extend = function (target, src) {
     for (var prop in src) {
+      /* istanbul ignore else */
       if (hasOwn.call(src, prop)) {
         target[prop] = src[prop];
       }
@@ -176,6 +169,30 @@
       }
       return this._node.id;
     },
+    region: function() {
+      var region = {
+        width: this.prop('offsetWidth'),
+        height: this.prop('offsetHeight')
+      };
+      var box = this._node.getBoundingClientRect();
+      var clientTop = docElem.clientTop || body.clientTop || 0;
+      var clientLeft = docElem.clientLeft || body.clientLeft || 0;
+      var scrollTop = root.pageYOffset || docElem.scrollTop || body.scrollTop;
+      var scrollLeft = root.pageXOffset || docElem.scrollLeft || body.scrollLeft;
+      region.top = box.top + scrollTop - clientTop;
+      region.left = box.left + scrollLeft - clientLeft;
+      region.bottom = region.top + region.height;
+      region.right = region.left + region.width;
+
+      return region;
+    },
+    intersects: function(other) {
+      var me = this.region(), you = other.region();
+      return !(
+        me.left > you.right || me.right < you.left || me.top > you.bottom || me.bottom < you.top ||
+        you.left > me.right || you.right < me.left || you.top > me.bottom || you.bottom < me.top
+      );
+    },
     // traversal foo
     ancestors: function () {
       var anc = [];
@@ -248,8 +265,10 @@
       } else {
         if (!is(func, val)) {
           this._node.setAttribute('data-' + property, val);
-          return this;
+        } else {
+          this._node.setAttribute('data-' + property, val.call(this, property))
         }
+        return this;
       }
     },
     rmData: function (property) {
@@ -325,6 +344,7 @@
         this.attr('style', '');
       }
       for (var i in newStyles) {
+        /* istanbul ignore else */
         if (hasOwn.call(newStyles, i)) {
           var styleKey = _jsStyle(i);
           this._node.style[styleKey] = newStyles[i];
@@ -563,7 +583,7 @@
     }
   });
 
-  function EventInstance(e, attrs) {
+  function EventInstance(e) {
 
     this._e = e;
     //noinspection JSUnresolvedVariable
@@ -671,6 +691,7 @@
       if (this._cached[stringy]) {
         // Iteratre through the cached callbacks and remove the correct one based on reference
         for (i = 0, numCbs = this._cached[stringy].length; i < numCbs; i++) {
+          /* istanbul ignore else */
           if (this._cached[stringy][i].raw === callback) {
             implementOn.removeEventListener(event, this._cached[stringy][i].fn);
           }
@@ -680,9 +701,9 @@
       }
     },
     ready: function (fn) {
-      var done = false, top = true,
-        add = doc.attachEvent ? 'attachEvent' : 'addEventListener', rem = doc.attachEvent ? 'detachEvent'
-          : 'removeEventListener', pre = doc.attachEvent ? 'on' : '',
+      var done = false,
+        add = doc.attachEvent ? /* istanbul ignore next */ 'attachEvent' : 'addEventListener', rem = doc.attachEvent ? /* istanbul ignore next */ 'detachEvent'
+          : 'removeEventListener', pre = doc.attachEvent ? /* istanbul ignore next */ 'on' : '',
         init = function (e) {
           if (e.type === 'readystatechange' && doc.readyState !== 'complete') {
             return;
@@ -867,7 +888,10 @@
       return function (a) {
         for (a = 0; a < 4; a++) {
           try {
-            return a ? new ActiveXObject([, 'Msxml2', 'Msxml3', 'Microsoft'][a] + '.XMLHTTP') : new XMLHttpRequest;
+            return a ?
+              /* istanbul ignore next: will not be executed on ci, but is proven to work */
+              new ActiveXObject([, 'Msxml2', 'Msxml3', 'Microsoft'][a] + '.XMLHTTP') :
+                new XMLHttpRequest;
           } catch (e) {
           }
         }
@@ -924,13 +948,16 @@
         return new Promise(function (resolve, reject) {
           req.onload = function () {
             var res = response();
-            cache.set(o.url, {ok: true, res: res, req: req});
-            resolve({res: res, req: req});
+            var val = {ok: true, res: res, req: req};
+            cache.set(o.url, val);
+            resolve(val);
           };
+          /* istanbul ignore next: this is difficult to unit-test */
           req.onerror = function () {
             var res = response();
-            cache.set(o.url, {ok: false, res: res, req: req});
-            reject({res: res, req: req});
+            var val = {ok: false, res: res, req: req};
+            cache.set(o.url, val);
+            reject(val);
           };
           req.send(o.data && !noData ? o.data : null);
         });
@@ -942,10 +969,12 @@
       if (cache.has(o.url)) {
         return new Promise(function (resolve, reject) {
           var val = cache.get(options.url);
+          /* istanbul ignore else */
           if (val.ok) {
-            resolve({res: val.res, req: val.req});
+            resolve(val);
           } else {
-            reject({res: val.res, req: val.req});
+            /* istanbul ignore next: this is difficult to unit-test */
+            reject(val);
           }
         });
       }
