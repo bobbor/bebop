@@ -23,6 +23,7 @@
     "grunt-contrib-uglify": "0.8.0",
     "karma": "0.12.31",
     "karma-chai": "0.1.0",
+    "karma-coffee-preprocessor": "^0.3.0",
     "karma-coverage": "0.2.7",
     "karma-fixture": "0.2.2",
     "karma-html2js-preprocessor": "0.1.0",

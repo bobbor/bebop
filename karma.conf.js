@@ -5,11 +5,12 @@ module.exports = function (config) {
     files: [
       {pattern: 'src/*.js'},
       {pattern: 'test/fixtures/**/*'},
-      {pattern: 'test/tests/*.test.js'},
+      {pattern: 'test/tests/*.test.coffee'},
       {pattern: 'test/io/*', watched: false, included: false, served: true}
     ],
     exclude: [],
     preprocessors: {
+      'test/tests/*.test.coffee': ['coffee'],
       'test/fixtures/**/*.html': ['html2js'],
       'test/fixtures/**/*.json': ['html2js'],
       'src/*.js': ['coverage']
