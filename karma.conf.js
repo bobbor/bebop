@@ -3,7 +3,7 @@ module.exports = function (config) {
     basePath: '',
     frameworks: ['mocha', 'fixture', 'chai', 'sinon'],
     files: [
-      {pattern: 'src/*.js'},
+      {pattern: 'src/*.coffee'},
       {pattern: 'test/fixtures/**/*'},
       {pattern: 'test/tests/*.test.coffee'},
       {pattern: 'test/io/*', watched: false, included: false, served: true}
@@ -13,12 +13,12 @@ module.exports = function (config) {
       'test/tests/*.test.coffee': ['coffee'],
       'test/fixtures/**/*.html': ['html2js'],
       'test/fixtures/**/*.json': ['html2js'],
-      'src/*.js': ['coverage']
+      'src/*.coffee': ['coffee']
     },
     proxies: {
       '/io/': '/base/test/io/'
     },
-    reporters: ['dots', 'coverage'],
+    reporters: ['dots'],
     port: 9876,
     colors: true,
     logLevel: config.LOG_INFO,

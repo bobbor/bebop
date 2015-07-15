@@ -253,11 +253,6 @@ describe '::Element::', ->
       p = el.prop()
       expect(p).to.equal(null)
 
-    it 'should fallback to parent if the property is "parentNode"', ->
-      el = $.one('#id2 input')
-
-      expect(el.prop('parentNode').is(el.parent())).to.be.true
-
 
   describe 'attr', ->
     it 'should test if it has the attribute', ->
