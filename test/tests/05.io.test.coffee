@@ -63,7 +63,7 @@ describe 'IO', ->
         done()
       ).catch((err) -> done err )
   describe 'content', ->
-    it 'should request text', (done) ->
+    it 'should request text', (done) -> # this one hits the cache
       $.io.get({
         url: '/io/one.txt'
       }).then((xhr) ->

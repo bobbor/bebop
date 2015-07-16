@@ -3,11 +3,11 @@ module.exports = function(grunt) {
     clean: {
       dist: ['dist']
     },
-    copy: {
+    coffee: {
       dist: {
         files: [{
           dest: 'dist/bebop.js',
-          src: 'src/bebop.js'
+          src: 'src/bebop.coffee'
         }]
       }
     },
@@ -22,10 +22,10 @@ module.exports = function(grunt) {
   });
 
   grunt.loadNpmTasks('grunt-contrib-clean');
-  grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-contrib-coffee');
   grunt.loadNpmTasks('grunt-contrib-uglify');
 
   grunt.registerTask('test', ['karma', 'coveralls']);
 
-  grunt.registerTask('default', ['clean', 'copy', 'uglify']);
+  grunt.registerTask('default', ['clean', 'coffee', 'uglify']);
 };

@@ -563,159 +563,104 @@
   event = new _Event()
   bebop.ready = event.ready
 
-  `
-      var Promise = bebop.Promise = (function () {
-          var localPromise = function (callback, handler) {
-              handler = function pendingHandler(resolved, rejected, value, queue, then, i) {
-                  queue = pendingHandler.q;
+  Promise = (->
+    localPromise = (callback) ->
+      handler = pendingHandler = (resolved, rejected, value) ->
+        _then = null
+        i = 0
+        queue = pendingHandler.q
+        if resolved isnt _is
+          return Promise((resolve, reject) ->
+            queue.push
+              p: @
+              r:resolve
+              j:reject
+              1:resolved
+              0:rejected
+            undef
+          )
+        if value and (_is(func, value) or _is obj, value)
+          try
+            _then = value.then
+          catch reason
+            rejected = 0
+            value = reason
+        if _is func, _then
+          valueHandler = (resolved) ->
+            (value) ->
+              if _then
+                _then = 0
+                pendingHandler _is, resolved, value
+          try
+            rejected = valueHandler 0
+            _then.call value, valueHandler(1), rejected
+          catch reason
+            rejected reason
+        else
+          handler = (Resolved, Rejected) ->
+            candidate = Resolved = if rejected then Resolved else Rejected
+            unless _is func, candidate
+              return callback
+            return Promise((resolve, reject) ->
+              finalize @, resolve, reject, value, Resolved
+            )
+          while i < queue.length
+            _then = queue[i++]
+            resolved = _then[rejected]
+            unless _is func, resolved
+              candidate = if rejected then _then.r else _then.j
+              candidate value
+            else
+              finalize _then.p, _then.r, _then.j, value, resolved
+      handler.q = []
+      callback.call(callback = {
+        then: (resolved, rejected) ->
+          handler resolved, rejected
+        'catch': (rejected) ->
+          handler 0, rejected
+      },
+        (value) -> handler(_is, 1, value),
+        (reason) -> handler(_is, 0, reason) )
+      callback
 
-                  // Case 1) handle a .then(resolved, rejected) call
-                  if (resolved !== _is) {
-                      return Promise(function (resolve, reject) {
-                          queue.push({p: this, r: resolve, j: reject, 1: resolved, 0: rejected});
-                      });
-                  }
+    finalize = (promise, resolve, reject, value, transform) ->
+      setTimeout ->
+        try
+          value = transform value
+          if value and (_is(obj, value) or _is func, value)
+            transform = value.then
+          unless _is func, transform
+            resolve value
+          else if value is promise
+            reject TypeError()
+          else
+            transform.call value, resolve, reject
+        catch err
+          reject err
+      , 0
+    ResolvedPromise = (value) ->
+      localPromise (resolve) ->
+        resolve value
 
-                  // Case 2) handle a resolve or reject call
-                  // ('resolved' === 'is' acts as a sentinel)
-                  // The actual function signature is
-                  // .re[ject|solve](<is>, success, value)
+    localPromise.resolve = ResolvedPromise
+    localPromise.reject = (reason) ->
+        localPromise (resolve, reject) ->
+            reject reason
 
-                  // Check if the value is a promise and try to obtain its 'then' method
-                  if (value && (_is(func, value) | _is(obj, value))) {
-                      try {
-                          then = value.then;
-                      }
-                      catch (reason) {
-                          rejected = 0;
-                          value = reason;
-                      }
-                  }
-                  // If the value is a promise, take over its state
-                  if (_is(func, then)) {
-                      function valueHandler(resolved) {
-                          return function (value) {
-                              then && (then = 0, pendingHandler(is, resolved, value));
-                          };
-                      }
+    localPromise.all = (promises) ->
+        localPromise (resolve, reject, count, values) ->
+            values = []
+            count = promises.length or resolve values
+            promises.map (promise, index) ->
+                ResolvedPromise(promise).then((value) ->
+                  values[index] = value
+                  --count or resolve values
+                , reject)
+    localPromise;
+  )()
 
-                      try {
-                          then.call(value, valueHandler(1), rejected = valueHandler(0));
-                      }
-                      catch (reason) {
-                          rejected(reason);
-                      }
-                  }
-                  // The value is not a promise; handle resolve/reject
-                  else {
-                      // Replace this handler with a finalized resolved/rejected handler
-                      handler = function (Resolved, Rejected) {
-                          // If the Resolved or Rejected parameter is not a function,
-                          // return the original promise (now stored in the 'callback' variable)
-                          if (!_is(func, (Resolved = rejected ? Resolved : Rejected))) {
-                              return callback;
-                          }
-                          // Otherwise, return a finalized promise, transforming the value with the function
-                          return Promise(function (resolve, reject) {
-                              finalize(this, resolve, reject, value, Resolved);
-                          });
-                      };
-                      // Resolve/reject pending callbacks
-                      i = 0;
-                      while (i < queue.length) {
-                          then = queue[i++];
-                          // If no callback, just resolve/reject the promise
-                          if (!_is(func, resolved = then[rejected])) {
-                              (rejected ? then.r : then.j)(value);
-                          }// Otherwise, resolve/reject the promise with the result of the callback
-                          else {
-                              finalize(then.p, then.r, then.j, value, resolved);
-                          }
-                      }
-                  }
-              };
-              // The queue of pending callbacks; garbage-collected when handler is resolved/rejected
-              handler.q = [];
+  bebop.Promise = Promise
 
-              // Create and return the promise (reusing the callback variable)
-              callback.call(callback = {
-                      then: function (resolved, rejected) {
-                          return handler(resolved, rejected);
-                      },
-                      'catch': function (rejected) {
-                          return handler(0, rejected);
-                      }
-                  },
-                  function (value) {
-                      handler(_is, 1, value);
-                  },
-                  function (reason) {
-                      handler(_is, 0, reason);
-                  });
-              return callback;
-          };
-          // Finalizes the promise by resolving/rejecting it with the transformed value
-          function finalize(promise, resolve, reject, value, transform) {
-              setTimeout(function () {
-                  try {
-                      // Transform the value through and check whether it's a promise
-                      value = transform(value);
-                      transform = value && (_is(obj, value) | _is(func, value)) && value.then;
-                      // Return the result if it's not a promise
-                      if (!_is(func, transform)) {
-                          resolve(value);
-                      }// If it's a promise, make sure it's not circular
-                      else if (value === promise) {
-                          reject(TypeError());
-                      }// Take over the promise's state
-                      else {
-                          transform.call(value, resolve, reject);
-                      }
-                  }
-                  catch (error) {
-                      reject(error);
-                  }
-              }, 0);
-          }
-
-          // Creates a resolved promise
-          localPromise.resolve = ResolvedPromise;
-          function ResolvedPromise(value) {
-              return localPromise(function (resolve) {
-                  resolve(value);
-              });
-          }
-
-          // Creates a rejected promise
-          localPromise.reject = function (reason) {
-              return localPromise(function (resolve, reject) {
-                  reject(reason);
-              });
-          };
-
-          // Transforms an array of promises into a promise for an array
-          localPromise.all = function (promises) {
-              return localPromise(function (resolve, reject, count, values) {
-                  // Array of collected values
-                  values = [];
-                  // Resolve immediately if there are no promises
-                  count = promises.length || resolve(values);
-                  // Transform all elements ('map' is shorter than 'forEach')
-                  promises.map(function (promise, index) {
-                      ResolvedPromise(promise).then(
-                          // Store the value and resolve if it was the last
-                          function (value) {
-                              values[index] = value;
-                              --count || resolve(values);
-                          },
-                          // Reject if one element fails
-                          reject);
-                  });
-              });
-          };
-          return localPromise;
-      }());
-  `
   IO = ->
     xhr = ->
       (->
@@ -773,7 +718,7 @@
               ok: true
               res: res
               req: req
-            cache.set o.url, val
+            cache.set method+':'+o.url, val
             resolve val
           req.onerror = ->
             res = response()
@@ -781,18 +726,10 @@
               ok: false
               res: res
               req: req
-            cache.set o.url, val
+            cache.set method+':'+o.url, val
             reject val
           req.send (if o.data and not noData then o.data else null )
 
-      if o.bust
-        cache.del o.url
-
-      if cache.has o.url
-        return new Promise (resolve, reject) ->
-          val = cache.get(o.url)
-          if val.ok then resolve val else reject val
-      req = xhr()
 
       unless inst FormData, o.data
         o.data = Object.keys(o.data).map((key) ->
@@ -801,6 +738,14 @@
 
       if noData
         o.url += '?'+o.data
+
+      if o.bust
+        cache.del method+':'+o.url
+      if cache.has method+':'+o.url
+        return new Promise (resolve, reject) ->
+          val = cache.get method+':'+o.url
+          if val.ok then resolve val else reject val
+      req = xhr()
 
       req.open method, o.url
       req.setRequestHeader 'X-Requested-With', 'bebop.io'
