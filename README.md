@@ -37,6 +37,4 @@ Just the every-day business with such a library.
 
 ### How to use
 
-@see the [documentation][1]
-
-[1]: (http://bobbor.github.io/bebop)
+documentation is about to follow
