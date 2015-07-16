@@ -33,6 +33,6 @@
     "bower_components",
     "test",
     "bower.json",
-    "src/*"
+    "src"
   ]
 }
