@@ -40,7 +40,7 @@
     return item instanceof klas;
   }
 
-  bebop.VERSION = '1.0.5';
+  bebop.VERSION = '1.1.0';
 
   var uuid = bebop.uuid = (function () {
     var counter = 0;

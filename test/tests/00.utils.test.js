@@ -54,13 +54,13 @@
 
       it('should noConflict', function() {
         var own = $.noConflict();
-        expect(own.VERSION).to.equal('1.0.5');
-        expect(bebop.VERSION).to.equal('1.0.5');
+        expect(own.VERSION).to.equal('1.1.0');
+        expect(bebop.VERSION).to.equal('1.1.0');
         expect(window.$).to.be.undefined;
       });
       it('should deep noConflict', function() {
         var own = $.noConflict(true);
-        expect(own.VERSION).to.equal('1.0.5');
+        expect(own.VERSION).to.equal('1.1.0');
         expect(window.bebop).to.be.undefined;
         expect(window.$).to.be.undefined;
       });
